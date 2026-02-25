@@ -1,0 +1,92 @@
+services:
+  react-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: react-app
+    ports:
+      - "80:80"
+    networks:
+      - monitoring
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - monitoring
+    environment:
+      - GF_RENDERING_SERVER_URL=http://grafana-image-renderer:8081/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+      - GF_SERVER_DOMAIN=192.168.1.10        # replace with your server IP/hostname
+      - GF_SERVER_ROOT_URL=http://192.168.1.10:3000/
+      - GF_RENDERING_VIEWPORT_WIDTH=1920     # width of the screenshot
+      - GF_RENDERING_VIEWPORT_HEIGHT=9000    # increase height to capture full dashboard
+      - GF_RENDERING_VIEWPORT_DEVICE_SCALE_FACTOR=2
+
+  node-exporter:
+    image: prom/node-exporter
+    container_name: node-exporter
+    ports:
+      - "9200:9100"
+    networks:
+      - monitoring
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8082:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - monitoring
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command: -nginx.scrape-uri=http://react-app:80/stub_status
+    ports:
+      - "9113:9113"
+    networks:
+      - monitoring
+
+  grafana-image-renderer:
+    image: grafana/grafana-image-renderer:latest
+    container_name: grafana-image-renderer
+    networks:
+      - monitoring
+    # optional: only expose if you want to test from host
+    # ports:
+    #   - "8083:8081"
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: blackbox-exporter
+    ports:
+      - "9115:9115"
+    networks:
+      - monitoring
+    command:
+      - "--config.file=/etc/blackbox/blackbox.yml"
+    volumes:
+      - ../monitoring/blackbox.yml:/etc/blackbox/blackbox.yml
+
+networks:
+  monitoring:
+    driver: bridge
+

@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKERHUB_USER = 'bibekdec2022'
+        IMAGE_NAME     = 'my-react-app'
+    }
+
+    stages {
+
+        stage('Build') {
+            steps {
+                sh 'scripts/build.sh'
+            }
+        }
+
+        stage('Push Image') {
+            when {
+                anyOf {
+                    branch 'dev'
+                    branch 'main'
+                }
+            }
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+
+                    script {
+
+                        if (env.BRANCH_NAME == 'dev') {
+
+                            sh """
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:${BUILD_NUMBER}
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:latest
+
+                                docker push $DOCKERHUB_USER/dev:${BUILD_NUMBER}
+                                docker push $DOCKERHUB_USER/dev:latest
+                            """
+
+                        } else if (env.BRANCH_NAME == 'main') {
+
+                            sh """
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:${BUILD_NUMBER}
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:latest
+
+                                docker push $DOCKERHUB_USER/prod:${BUILD_NUMBER}
+                                docker push $DOCKERHUB_USER/prod:latest
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                anyOf {
+                    branch 'dev'
+                    branch 'main'
+                }
+            }
+            steps {
+                sh 'scripts/deploy.sh'
+            }
+        }
+    }
+}
