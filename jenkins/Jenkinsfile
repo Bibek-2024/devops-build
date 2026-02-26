@@ -6,7 +6,35 @@ pipeline {
         IMAGE_NAME     = 'my-react-app'
     }
 
+    options {
+        skipDefaultCheckout()  // We'll handle checkout manually
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
     stages {
+
+        stage('Checkout') {
+            steps {
+                // Clean workspace to avoid stale files
+                cleanWs()
+                
+                // Checkout from git
+                checkout([
+                    $class: 'GitSCM', 
+                    branches: [[name: '*/dev']], // You can parameterize this
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [[$class: 'CleanBeforeCheckout']], 
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/Bibek-2024/devops-build.git',
+                        credentialsId: 'github-cred'
+                    ]]
+                ])
+                
+                // Print branch info
+                sh 'git branch -a'
+                sh 'git status'
+            }
+        }
 
         stage('Build') {
             steps {
@@ -16,10 +44,7 @@ pipeline {
 
         stage('Push Image') {
             when {
-                anyOf {
-                    branch 'dev'
-                    branch 'main'
-                }
+                expression { return env.GIT_BRANCH =~ /(dev|main)$/ }
             }
             steps {
                 withCredentials([usernamePassword(
@@ -27,33 +52,18 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-
-                    sh '''
-                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-                    '''
+                    sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
 
                     script {
+                        def branch = env.GIT_BRANCH.replaceAll('origin/', '')
+                        def tag = "${DOCKERHUB_USER}/${branch}:${BUILD_NUMBER}"
 
-                        if (env.BRANCH_NAME == 'dev') {
-
-                            sh """
-                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:${BUILD_NUMBER}
-                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:latest
-
-                                docker push $DOCKERHUB_USER/dev:${BUILD_NUMBER}
-                                docker push $DOCKERHUB_USER/dev:latest
-                            """
-
-                        } else if (env.BRANCH_NAME == 'main') {
-
-                            sh """
-                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:${BUILD_NUMBER}
-                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:latest
-
-                                docker push $DOCKERHUB_USER/prod:${BUILD_NUMBER}
-                                docker push $DOCKERHUB_USER/prod:latest
-                            """
-                        }
+                        sh """
+                            docker tag $IMAGE_NAME:latest $tag
+                            docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/${branch}:latest
+                            docker push $tag
+                            docker push $DOCKERHUB_USER/${branch}:latest
+                        """
                     }
                 }
             }
@@ -61,14 +71,20 @@ pipeline {
 
         stage('Deploy') {
             when {
-                anyOf {
-                    branch 'dev'
-                    branch 'main'
-                }
+                expression { return env.GIT_BRANCH =~ /(dev|main)$/ }
             }
             steps {
                 sh 'scripts/deploy.sh'
             }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully!"
+        }
+        failure {
+            echo "Pipeline failed!"
         }
     }
 }
