@@ -1,31 +1,21 @@
 #!/bin/bash
 set -e
 
-DOCKERHUB_USER=${DOCKERHUB_USER:-bibekdec2022}
-BRANCH_NAME=${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD || echo "dev")}
+# --- Configuration ---
+DOCKERHUB_USERNAME="bibekdec2022"   # <-- replace with your actual Docker Hub username
+IMAGE_NAME="dev"                    # <-- use "dev" since that's the repo you push to
 TAG="latest"
+REPO="${DOCKERHUB_USERNAME}/${IMAGE_NAME}"
+CONTAINER_NAME="react-app"          # keep the container name consistent
 
-case "$BRANCH_NAME" in
-    dev)
-        IMAGE="$DOCKERHUB_USER/dev:$TAG"
-        ;;
-    main|master)
-        IMAGE="$DOCKERHUB_USER/prod:$TAG"
-        ;;
-    *)
-        echo "Branch '$BRANCH_NAME' does not match dev/main, skipping deploy"
-        exit 0
-        ;;
-esac
+# --- Deployment Steps ---
 
-echo "Deploying Docker image: $IMAGE"
+echo "Pulling image ${REPO}:${TAG}..."
+docker pull "${REPO}:${TAG}"
 
-# Stop/remove old container safely
-docker stop react-app || true
-docker rm react-app || true
+echo "Stopping old container ${CONTAINER_NAME}..."
+docker stop "${CONTAINER_NAME}" || true
+docker rm "${CONTAINER_NAME}" || true
 
-echo "Pulling image..."
-docker pull $IMAGE || true
-
-echo "Running new container..."
-docker run -d --name react-app -p 80:80 $IMAGE
+echo "Running new container ${CONTAINER_NAME}..."
+docker run -d --name "${CONTAINER_NAME}" -p 80:80 "${REPO}:${TAG}"
