@@ -5,36 +5,45 @@ set -e
 # Variables
 # -----------------------------
 IMAGE_NAME="my-react-app"
-DOCKERHUB_USER="bibekdec2022"   # your Docker Hub username
-DOCKERFILE_PATH="docker/Dockerfile"
-
-# Detect branch: prefer BRANCH_NAME from Jenkins, fallback to git
+DOCKERHUB_USER=${DOCKERHUB_USER:-bibekdec2022}
 BRANCH_NAME=${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD || echo "dev")}
+TAG=${BUILD_NUMBER:-latest}  # use Jenkins build number if available
 
-echo "Current branch: $BRANCH_NAME"
-
-# -----------------------------
-# Build Docker image
-# -----------------------------
-echo "Building Docker image..."
-docker build -t $IMAGE_NAME:latest -f $DOCKERFILE_PATH .
-
-# -----------------------------
-# Tag Docker image
-# -----------------------------
-echo "Tagging Docker image..."
+# Determine full image name based on branch
 case "$BRANCH_NAME" in
     dev)
-        docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:latest
-        docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:${BUILD_NUMBER:-latest}
+        IMAGE="$DOCKERHUB_USER/dev:$TAG"
         ;;
     main|master)
-        docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:latest
-        docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:${BUILD_NUMBER:-latest}
+        IMAGE="$DOCKERHUB_USER/prod:$TAG"
         ;;
     *)
-        echo "Branch '$BRANCH_NAME' does not match dev/main, skipping DockerHub tagging."
+        echo "Branch '$BRANCH_NAME' does not match dev/main, skipping deploy."
+        exit 0
         ;;
 esac
 
-echo "Docker build and tagging completed successfully!"
+echo "Deploying Docker image: $IMAGE"
+
+# Stop old container if exists
+if [ "$(docker ps -q -f name=react-app)" ]; then
+    echo "Stopping old container..."
+    docker stop react-app
+fi
+
+if [ "$(docker ps -aq -f name=react-app)" ]; then
+    echo "Removing old container..."
+    docker rm react-app
+fi
+
+# Pull latest image (optional, since Jenkins already built it)
+docker pull $IMAGE || true
+
+# Run new container
+echo "Running new container..."
+docker run -d \
+    --name react-app \
+    -p 80:80 \
+    $IMAGE
+
+echo "Deployment completed successfully!"
