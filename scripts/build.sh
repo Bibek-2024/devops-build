@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 
 # --- Configuration ---
 #DOCKERHUB_USERNAME="bibekdec2022"   # <-- replace with your actual Docker Hub username
