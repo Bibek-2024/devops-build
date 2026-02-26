@@ -20,6 +20,7 @@ esac
 
 echo "Deploying Docker image: $IMAGE"
 
+# Stop/remove old container safely
 docker stop react-app || true
 docker rm react-app || true
 
