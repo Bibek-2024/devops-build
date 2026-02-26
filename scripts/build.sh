@@ -1,19 +1,15 @@
 #!/bin/bash
-#docker build -t my-react-app:latest -f docker/Dockerfile .
-#From here new updated script for cicd flow test
-
 set -e
 
 # -----------------------------
 # Variables
 # -----------------------------
 IMAGE_NAME="my-react-app"
-DOCKERHUB_USER="bibekdec2022"   # replace with your Docker Hub username
+DOCKERHUB_USER="bibekdec2022"   # your Docker Hub username
 DOCKERFILE_PATH="docker/Dockerfile"
 
-# Detect current branch reliably (works in Jenkins detached HEAD)
-BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD || echo "dev")  
-# fallback to dev if HEAD is detached
+# Detect branch: prefer BRANCH_NAME from Jenkins, fallback to git
+BRANCH_NAME=${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD || echo "dev")}
 
 echo "Current branch: $BRANCH_NAME"
 

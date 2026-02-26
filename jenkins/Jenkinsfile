@@ -17,22 +17,31 @@ pipeline {
             steps {
                 // Clean workspace to avoid stale files
                 cleanWs()
-                
-                // Checkout from git
+
+                // Checkout from git and track branch properly
                 checkout([
-                    $class: 'GitSCM', 
-                    branches: [[name: '*/dev']], // You can parameterize this
+                    $class: 'GitSCM',
+                    branches: [[name: '*/dev']],   // parameterize if needed
                     doGenerateSubmoduleConfigurations: false,
-                    extensions: [[$class: 'CleanBeforeCheckout']], 
+                    extensions: [
+                        [$class: 'CleanBeforeCheckout'],
+                        [$class: 'LocalBranch', localBranch: 'dev']  // <-- track branch instead of detached HEAD
+                    ],
                     userRemoteConfigs: [[
                         url: 'https://github.com/Bibek-2024/devops-build.git',
                         credentialsId: 'github-cred'
                     ]]
                 ])
-                
+
                 // Print branch info
                 sh 'git branch -a'
                 sh 'git status'
+
+                // Export branch for build.sh
+                script {
+                    env.BRANCH_NAME = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
+                    echo "Detected branch: ${env.BRANCH_NAME}"
+                }
             }
         }
 
@@ -43,8 +52,9 @@ pipeline {
         }
 
         stage('Push Image') {
+            // Only run on dev or main
             when {
-                expression { return env.GIT_BRANCH =~ /(dev|main)$/ }
+                expression { return env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'main' }
             }
             steps {
                 withCredentials([usernamePassword(
@@ -55,23 +65,33 @@ pipeline {
                     sh 'echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin'
 
                     script {
-                        def branch = env.GIT_BRANCH.replaceAll('origin/', '')
-                        def tag = "${DOCKERHUB_USER}/${branch}:${BUILD_NUMBER}"
+                        def branch = env.BRANCH_NAME
+                        echo "Pushing Docker image for branch: $branch"
 
-                        sh """
-                            docker tag $IMAGE_NAME:latest $tag
-                            docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/${branch}:latest
-                            docker push $tag
-                            docker push $DOCKERHUB_USER/${branch}:latest
-                        """
+                        if (branch == 'dev') {
+                            sh """
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:latest
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/dev:${BUILD_NUMBER}
+                                docker push $DOCKERHUB_USER/dev:latest
+                                docker push $DOCKERHUB_USER/dev:${BUILD_NUMBER}
+                            """
+                        } else if (branch == 'main') {
+                            sh """
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:latest
+                                docker tag $IMAGE_NAME:latest $DOCKERHUB_USER/prod:${BUILD_NUMBER}
+                                docker push $DOCKERHUB_USER/prod:latest
+                                docker push $DOCKERHUB_USER/prod:${BUILD_NUMBER}
+                            """
+                        }
                     }
                 }
             }
         }
 
         stage('Deploy') {
+            // Only run on dev or main
             when {
-                expression { return env.GIT_BRANCH =~ /(dev|main)$/ }
+                expression { return env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'main' }
             }
             steps {
                 sh 'scripts/deploy.sh'
