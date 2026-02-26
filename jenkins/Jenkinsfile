@@ -15,17 +15,15 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                // Clean workspace to avoid stale files
                 cleanWs()
 
-                // Checkout from git and track branch properly
                 checkout([
                     $class: 'GitSCM',
-                    branches: [[name: '*/dev']],   // parameterize if needed
+                    branches: [[name: '*/dev']],   // adjust if you want parameterized branch
                     doGenerateSubmoduleConfigurations: false,
                     extensions: [
                         [$class: 'CleanBeforeCheckout'],
-                        [$class: 'LocalBranch', localBranch: 'dev']  // <-- track branch instead of detached HEAD
+                        [$class: 'LocalBranch', localBranch: 'dev']
                     ],
                     userRemoteConfigs: [[
                         url: 'https://github.com/Bibek-2024/devops-build.git',
@@ -33,11 +31,9 @@ pipeline {
                     ]]
                 ])
 
-                // Print branch info
                 sh 'git branch -a'
                 sh 'git status'
 
-                // Export branch for build.sh
                 script {
                     env.BRANCH_NAME = sh(script: "git rev-parse --abbrev-ref HEAD", returnStdout: true).trim()
                     echo "Detected branch: ${env.BRANCH_NAME}"
@@ -52,7 +48,6 @@ pipeline {
         }
 
         stage('Push Image') {
-            // Only run on dev or main
             when {
                 expression { return env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'main' }
             }
@@ -89,7 +84,6 @@ pipeline {
         }
 
         stage('Deploy') {
-            // Only run on dev or main
             when {
                 expression { return env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'main' }
             }
