@@ -1,4 +1,3 @@
-It is worked to some extend now.
 Test Agian
 Testing again
 Git update
