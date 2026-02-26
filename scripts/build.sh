@@ -4,12 +4,13 @@ set -e
 # -----------------------------
 # Variables
 # -----------------------------
+# Use Jenkins environment variables if available
+DOCKERHUB_USER=${DOCKERHUB_USER:-bibekdec2022}    # fallback if Jenkins env missing
 IMAGE_NAME="my-react-app"
-DOCKERHUB_USER=${DOCKERHUB_USER:-bibekdec2022}       # from Jenkins env or fallback
 BRANCH_NAME=${BRANCH_NAME:-$(git rev-parse --abbrev-ref HEAD || echo "dev")}
 TAG="latest"
 
-# Determine which image to deploy based on branch
+# Decide which image to deploy based on branch
 case "$BRANCH_NAME" in
     dev)
         IMAGE="$DOCKERHUB_USER/dev:$TAG"
@@ -25,21 +26,21 @@ esac
 
 echo "Deploying Docker image: $IMAGE"
 
-# Stop old container if exists
-if [ "$(docker ps -q -f name=react-app)" ]; then
+# Stop old container if it exists
+if docker ps -q -f name=react-app >/dev/null 2>&1; then
     echo "Stopping old container..."
     docker stop react-app
 fi
 
-# Remove old container if exists
-if [ "$(docker ps -aq -f name=react-app)" ]; then
+# Remove old container if it exists
+if docker ps -aq -f name=react-app >/dev/null 2>&1; then
     echo "Removing old container..."
     docker rm react-app
 fi
 
-# Pull the latest image (optional, safe even if built locally)
+# Pull the latest image (optional, safe even if already built locally)
 echo "Pulling image..."
-docker pull $IMAGE || true
+docker pull $IMAGE || echo "Image not found locally, using local build"
 
 # Run new container
 echo "Running new container..."
