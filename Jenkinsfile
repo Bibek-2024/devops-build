@@ -3,16 +3,15 @@ pipeline {
  agent any
 
  environment {
-  DOCKERHUB_USER = "bibekdec2022"
+  DOCKER_USER = "bibekdec2022"
   IMAGE_NAME = "my-react-app"
  }
 
  stages {
 
-  stage('Checkout Code') {
+  stage('Checkout') {
    steps {
-    git branch: "dev",
-    url: 'https://github.com/Bibek-2024/devops-build.git'
+    checkout scm
    }
   }
 
@@ -32,14 +31,14 @@ pipeline {
 
     withCredentials([usernamePassword(
         credentialsId: 'dockerhub-creds',
-        usernameVariable: 'DOCKER_USER',
-        passwordVariable: 'DOCKER_PASS'
+        usernameVariable: 'USERNAME',
+        passwordVariable: 'PASSWORD'
     )]) {
 
      sh '''
-     echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-     docker tag my-react-app $DOCKERHUB_USER/dev:latest
-     docker push $DOCKERHUB_USER/dev:latest
+     echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
+     docker tag my-react-app $DOCKER_USER/dev:latest
+     docker push $DOCKER_USER/dev:latest
      '''
 
     }
@@ -58,14 +57,14 @@ pipeline {
 
     withCredentials([usernamePassword(
         credentialsId: 'dockerhub-creds',
-        usernameVariable: 'DOCKER_USER',
-        passwordVariable: 'DOCKER_PASS'
+        usernameVariable: 'USERNAME',
+        passwordVariable: 'PASSWORD'
     )]) {
 
      sh '''
-     echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-     docker tag my-react-app $DOCKERHUB_USER/prod:latest
-     docker push $DOCKERHUB_USER/prod:latest
+     echo "$PASSWORD" | docker login -u "$USERNAME" --password-stdin
+     docker tag my-react-app $DOCKER_USER/prod:latest
+     docker push $DOCKER_USER/prod:latest
      '''
 
     }
