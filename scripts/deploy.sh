@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+BRANCH_NAME=$1
 
 if [ "$BRANCH_NAME" == "dev" ]; then
     IMAGE="bibekdec2022/dev:latest"

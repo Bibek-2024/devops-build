@@ -11,7 +11,7 @@ pipeline {
 
   stage('Checkout Code') {
    steps {
-    git branch: "${env.BRANCH_NAME}",
+    git branch: "dev",
     url: 'https://github.com/Bibek-2024/devops-build.git'
    }
   }
@@ -22,7 +22,7 @@ pipeline {
    }
   }
 
-  stage('Push Image DEV') {
+  stage('Push DEV Image') {
 
    when {
     branch 'dev'
@@ -48,7 +48,7 @@ pipeline {
 
   }
 
-  stage('Push Image PROD') {
+  stage('Push PROD Image') {
 
    when {
     branch 'master'
@@ -74,9 +74,9 @@ pipeline {
 
   }
 
-  stage('Deploy Application') {
+  stage('Deploy') {
    steps {
-    sh 'bash scripts/deploy.sh'
+    sh "bash scripts/deploy.sh ${env.BRANCH_NAME}"
    }
   }
 
