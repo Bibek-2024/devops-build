@@ -50,7 +50,7 @@ pipeline {
   stage('Push PROD Image') {
 
    when {
-    branch 'master'
+    branch 'main'
    }
 
    steps {
@@ -80,5 +80,4 @@ pipeline {
   }
 
  }
-
 }
