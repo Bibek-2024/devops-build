@@ -5,8 +5,10 @@ BRANCH_NAME=$1
 
 if [ "$BRANCH_NAME" == "dev" ]; then
     IMAGE="bibekdec2022/dev:latest"
-elif [ "$BRANCH_NAME" == "master" ]; then
+
+elif [ "$BRANCH_NAME" == "main" ]; then
     IMAGE="bibekdec2022/prod:latest"
+
 else
     echo "Branch not supported"
     exit 1
