@@ -39,8 +39,10 @@ services:
       - GF_SMTP_ENABLED=true
       - GF_SMTP_HOST=smtp.gmail.com:587
       - GF_SMTP_USER=bibekkumarsahu2011@gmail.com
-      - GF_SMTP_PASSWORD=ahqy vwzk fiqh eebx
+      - GF_SMTP_PASSWORD="ahqyvwzkfiqheebx"
       - GF_SMTP_FROM_ADDRESS=bibekkumarsahu2011@gmail.com
+      - GF_SMTP_FROM_NAME=Grafana Alerts
+      - GF_SMTP_STARTTLS_POLICY=OpportunisticStartTLS
 
   node-exporter:
     image: prom/node-exporter
