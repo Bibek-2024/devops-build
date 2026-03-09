@@ -29,11 +29,18 @@ services:
     environment:
       - GF_RENDERING_SERVER_URL=http://grafana-image-renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
-      - GF_SERVER_DOMAIN=192.168.1.10        # replace with your server IP/hostname
-      - GF_SERVER_ROOT_URL=http://192.168.1.10:3000/
+      - GF_SERVER_DOMAIN=65.0.118.121        # replace with your server IP/hostname
+      - GF_SERVER_ROOT_URL=http://65.0.118.121:3000/
       - GF_RENDERING_VIEWPORT_WIDTH=1920     # width of the screenshot
       - GF_RENDERING_VIEWPORT_HEIGHT=9000    # increase height to capture full dashboard
       - GF_RENDERING_VIEWPORT_DEVICE_SCALE_FACTOR=2
+
+    environment:
+      - GF_SMTP_ENABLED=true
+      - GF_SMTP_HOST=smtp.gmail.com:587
+      - GF_SMTP_USER=bibekkumarsahu2011@gmail.com
+      - GF_SMTP_PASSWORD=ahqy vwzk fiqh eebx
+      - GF_SMTP_FROM_ADDRESS=bibekkumarsahu2011@gmail.com
 
   node-exporter:
     image: prom/node-exporter
