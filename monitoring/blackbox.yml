@@ -4,5 +4,8 @@ modules:
     timeout: 5s
     http:
       valid_http_versions: ["HTTP/1.1", "HTTP/2"]
-      valid_status_codes: []  # defaults to 2xx
+      valid_status_codes: []  # Defaults to 2xx
       method: GET
+      follow_redirects: true  # Added: crucial if your app redirects to another path/HTTPS
+      fail_if_ssl: false      # Set to true if you want to fail on expired certs
+      preferred_ip_protocol: "ip4" # Forces IPv4 to avoid common Docker IPv6 issues

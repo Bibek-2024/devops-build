@@ -1,5 +1,6 @@
 global:
   scrape_interval: 15s
+  scrape_timeout: 10s # Added to give probes enough time to finish
 
 scrape_configs:
   # Scrape Prometheus itself
@@ -7,17 +8,17 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  # Node Exporter metrics (system: CPU, memory, disk, network)
+  # Node Exporter metrics (System: CPU, memory, disk, network)
   - job_name: 'node'
     static_configs:
       - targets: ['node-exporter:9100']
 
-  # cAdvisor metrics (Docker containers: CPU, memory, network, filesystem)
+  # cAdvisor metrics (Containers: CPU, memory, network)
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
 
-  # Nginx Exporter metrics (React app served via Nginx)
+  # Nginx Exporter metrics (React app status)
   - job_name: 'nginx'
     static_configs:
       - targets: ['nginx-exporter:9113']
@@ -29,7 +30,7 @@ scrape_configs:
       module: [http_2xx]
     static_configs:
       - targets:
-          - http://react-app:80   # ecommerce site inside Docker
+          - http://react-app:80
           - https://www.google.com
           - https://www.guvi.in
     relabel_configs:
