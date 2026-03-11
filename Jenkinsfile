@@ -46,7 +46,7 @@ pipeline {
             steps {
                 // This command ensures the monitoring stack stays up 
                 // while updating the react-app to the latest build
-                sh "docker-compose -f docker/docker-compose.yml up -d"
+                sh "docker compose -f docker/docker-compose.yml up -d"
             }
         }
     }
