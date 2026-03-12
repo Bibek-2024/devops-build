@@ -4,7 +4,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: react-app
-    restart: always  # Added for auto-start
+    restart: always
     ports:
       - "80:80"
     networks:
@@ -13,7 +13,7 @@ services:
   prometheus:
     image: prom/prometheus
     container_name: prometheus
-    restart: always  # Added for auto-start
+    restart: always
     volumes:
       - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
@@ -24,7 +24,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
-    restart: always  # Added for auto-start
+    restart: always
     ports:
       - "3000:3000"
     networks:
@@ -34,11 +34,9 @@ services:
     environment:
       - GF_RENDERING_SERVER_URL=http://grafana-image-renderer:8081/render
       - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
-      - GF_SERVER_DOMAIN=13.203.106.154
-      - GF_SERVER_ROOT_URL=http://13.203.106.154:3000/
-      - GF_RENDERING_VIEWPORT_WIDTH=1920
-      - GF_RENDERING_VIEWPORT_HEIGHT=9000
-      - GF_RENDERING_VIEWPORT_DEVICE_SCALE_FACTOR=2
+      - GF_LOG_LEVEL=debug # Useful for troubleshooting renderer issues
+      - GF_SERVER_DOMAIN=65.2.56.74
+      - GF_SERVER_ROOT_URL=http://65.2.56.74:3000/
       - GF_SMTP_ENABLED=true
       - GF_SMTP_HOST=smtp.gmail.com:587
       - GF_SMTP_USER=bibekkumarsahu2011@gmail.com
@@ -48,50 +46,23 @@ services:
       - GF_SMTP_FROM_NAME=Grafana Alerts
       - GF_SMTP_STARTTLS_POLICY=MandatoryStartTLS
 
-  node-exporter:
-    image: prom/node-exporter
-    container_name: node-exporter
-    restart: always  # Added for auto-start
-    ports:
-      - "9200:9100"
-    networks:
-      - monitoring
-
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    restart: always  # Added for auto-start
-    ports:
-      - "8082:8080"
-    volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-    networks:
-      - monitoring
-
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:latest
-    container_name: nginx-exporter
-    restart: always  # Added for auto-start
-    command: -nginx.scrape-uri=http://react-app:80/stub_status
-    ports:
-      - "9113:9113"
-    networks:
-      - monitoring
-
   grafana-image-renderer:
     image: grafana/grafana-image-renderer:latest
     container_name: grafana-image-renderer
-    restart: always  # Added for auto-start
+    restart: always
     networks:
       - monitoring
+    environment:
+      - ENABLE_METRICS=true
+      - BROWSER_BIN=/usr/bin/google-chrome
+      - IGNORE_HTTPS_ERRORS=true
 
   blackbox-exporter:
     image: prom/blackbox-exporter:latest
     container_name: blackbox-exporter
-    restart: always  # Added for auto-start
+    restart: always
+    cap_add:
+      - NET_RAW # Required for ICMP (Ping) probes to work
     ports:
       - "9115:9115"
     networks:
@@ -100,6 +71,16 @@ services:
       - "--config.file=/etc/blackbox/blackbox.yml"
     volumes:
       - ../monitoring/blackbox.yml:/etc/blackbox/blackbox.yml
+
+  # ... (node-exporter, cadvisor, and nginx-exporter settings remain same)
+  # Ensure nginx-exporter command uses the service name 'react-app'
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    restart: always
+    command: -nginx.scrape-uri=http://react-app:80/stub_status
+    networks:
+      - monitoring
 
 networks:
   monitoring:
