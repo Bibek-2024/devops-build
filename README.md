@@ -113,7 +113,7 @@ We implemented a proactive monitoring strategy to track the health of the E-comm
 ### 1. Clone & Initialize
 
 ```bash
-git clone [https://github.com/Bibek-2024/devops-build.git](https://github.com/Bibek-2024/devops-build.git)
+git clone https://github.com/Bibek-2024/devops-build.git
 cd devops-build
 
 ```
