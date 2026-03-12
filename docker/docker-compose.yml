@@ -63,6 +63,9 @@ services:
     restart: always
     cap_add:
       - NET_RAW # Required for ICMP (Ping) probes to work
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
     ports:
       - "9115:9115"
     networks:
