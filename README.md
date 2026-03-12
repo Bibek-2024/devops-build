@@ -1,66 +1,69 @@
-To get that exact professional look in **VS Code**, you should create a file named `README.md`. VS Code has a built-in previewer (press `Ctrl + Shift + V`) that will show you exactly how this looks before you push it to GitHub.
+<h1 align="center">🛒 ReactJS E-Commerce DevOps Project</h1>
 
-Here is the complete, raw Markdown code. I have added **HTML anchors** (for the table of contents to work), **formatting for the directory tree**, and **professional tables** just like in your reference images.
+<p align="center">
+  <img src="https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white" />
+  <img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white" />
+  <img src="https://img.shields.io/badge/jenkins-%23D24939.svg?style=for-the-badge&logo=jenkins&logoColor=white" />
+  <img src="https://img.shields.io/badge/prometheus-e6522c?style=for-the-badge&logo=prometheus&logoColor=white" />
+  <img src="https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white" />
+</p>
 
-```markdown
-# 🛒 ReactJS E-Commerce DevOps Project
-> **Automating the Deployment & Monitoring of a Production-Grade React Application on AWS.**
+<p align="center">
+  <strong>Automating the Deployment & Monitoring of a Production-Grade React Application on AWS.</strong>
+</p>
 
 ---
 
 ## 📌 Table of Contents
-- [Overview](#-overview)
-- [Tools & Technologies](#-tools--technologies)
-- [Project Structure](#-project-structure)
-- [Pipeline Architecture](#-pipeline-architecture)
-- [CI/CD Branching Strategy](#-cicd-branching-strategy)
-- [Monitoring & Observability](#-monitoring--observability)
-- [How to Run This Project](#-how-to-run-this-project)
-- [Author & Contact](#-author--contact)
+* [Overview](#-overview)
+* [Tools & Technologies](#-tools--technologies)
+* [Project Structure](#-project-structure)
+* [Pipeline Architecture](#-pipeline-architecture)
+* [CI/CD Branching Strategy](#-cicd-branching-strategy)
+* [Monitoring & Observability](#-monitoring--observability)
+* [How to Run](#-how-to-run)
+* [Author & Contact](#-author--contact)
 
 ---
 
-<a name="overview"></a>
 ## 📖 Overview
-This project demonstrates a comprehensive DevOps lifecycle for a ReactJS E-commerce platform. It transitions from traditional manual deployments to a **Pipeline-as-Code** model, leveraging AWS infrastructure, Docker containerization, and a robust Prometheus/Grafana monitoring stack to ensure 99.9% availability.
+This project showcases a complete DevOps lifecycle for a ReactJS application hosted on AWS. It implements a **Pipeline-as-Code** model using Jenkins, ensuring that every code push is automatically validated, containerized, and deployed with zero manual intervention.
 
 ---
 
-<a name="tools--technologies"></a>
 ## 🛠 Tools & Technologies
 
 | Category | Tools Used |
 | :--- | :--- |
-| **Cloud Infrastructure** | AWS EC2 (t2.micro), Security Groups, IAM |
+| **Cloud** | AWS EC2 (Ubuntu 24.04), Security Groups, IAM |
 | **Containerization** | Docker, Docker Compose, Multi-stage Builds |
-| **CI/CD Automation** | Jenkins (Multibranch), GitHub Webhooks |
-| **Web Server** | Nginx (Alpine-optimized) |
+| **CI/CD** | Jenkins (Multibranch), GitHub Webhooks |
+| **Web Server** | Nginx (Optimized for React production builds) |
 | **Observability** | Prometheus, Grafana, Blackbox Exporter |
-| **Scripting** | Bash (Shell Automation) |
 
 ---
 
-<a name="project-structure"></a>
 ## 📂 Project Structure
+Actual directory tree from the `dev` branch:
+
 ```text
-devops-build/
-├── src/                # ReactJS frontend source code
-├── public/             # Static assets and index.html
-├── scripts/            # Shell scripts for automation
-│   ├── build.sh        # Automates Docker image creation
-│   └── deploy.sh       # Handles production deployment logic
-├── prometheus/         # Monitoring configuration
-│   └── prometheus.yml  # Metric scrape targets
-├── Dockerfile          # Multi-stage production Docker build
-├── docker-compose.yml  # Full-stack orchestration (App + Monitoring)
-├── Jenkinsfile         # CI/CD Pipeline-as-Code definition
-└── README.md           # Project documentation
-
-```
-
+.
+├── Jenkinsfile            # CI/CD Pipeline definition
+├── README.md              # Project Documentation
+├── build/                 # Production-ready React assets (Minified)
+├── docker/                # Container orchestration files
+│   ├── Dockerfile         # Multi-stage build (Alpine + Nginx)
+│   └── docker-compose.yml # App + Monitoring stack
+├── images/                # Documentation & Architecture assets
+├── monitoring/            # Scrape configs for Prometheus/Blackbox
+│   ├── blackbox.yml
+│   └── prometheus.yml
+├── nginx.conf             # Custom Nginx proxy configuration
+└── scripts/               # Automation & CI/CD helpers
+    ├── build.sh           # Docker image build logic
+    ├── deploy.sh          # EC2 deployment automation
+    └── health-check.sh    # Post-deployment validation
 ---
-
-<a name="pipeline-architecture"></a>
 
 ## 🏗️ Pipeline Architecture
 
@@ -74,8 +77,6 @@ devops-build/
 
 ---
 
-<a name="cicd-branching-strategy"></a>
-
 ## 🚀 CI/CD Branching Strategy
 
 | Branch | Env Target | Registry Repository | Access |
@@ -87,8 +88,6 @@ devops-build/
 
 ---
 
-<a name="monitoring--observability"></a>
-
 ## 📊 Monitoring & Observability
 
 We implemented a proactive monitoring strategy to track the health of the E-commerce platform:
@@ -99,14 +98,12 @@ We implemented a proactive monitoring strategy to track the health of the E-comm
 
 ---
 
-<a name="how-to-run-this-project"></a>
-
 ## ⚙️ How to Run This Project
 
 ### 1. Clone & Initialize
 
 ```bash
-git clone [https://github.com/sriram-R-krishnan/devops-build.git](https://github.com/sriram-R-krishnan/devops-build.git)
+git clone https://github.com/Bibek-2024/devops-build.git
 cd devops-build
 
 ```
@@ -128,27 +125,19 @@ docker-compose up -d --build
 
 ---
 
-<a name="author--contact"></a>
-
 ## 👤 Author & Contact
 
-**Your Name** *DevOps & Cloud Infrastructure Engineer*
+**Your Name** 
 
-📫 **Email:** [your-email@example.com]
-
-🔗 **LinkedIn:** [https://www.google.com/search?q=linkedin.com/in/your-profile]
-
-📁 **GitHub:** [https://www.google.com/search?q=github.com/sriram-R-krishnan]
+# Bibek Kumar Sahu
+### *Aspiring DevOps & Cloud Infrastructure Engineer*
 
 ---
 
-```
+📫 **Email:** [bibekkumarsahu2011@gmail.com]
 
-### **Pro-Tips for VS Code:**
-1.  **Preview Mode:** To see how this looks while you edit, click the **Open Preview to the Side** icon in the top right corner of VS Code (looks like a split page with a magnifying glass).
-2.  **Emojis:** I included emojis to match the "Professional Resume" look from the images you shared. They render perfectly on GitHub.
-3.  **Anchors:** The `<a name="..."></a>` tags are invisible on the page but allow the **Table of Contents** links to jump to the correct section when clicked.
+🔗 **LinkedIn:** [https://www.linkedin.com/in/bibekkumarsahu/]
 
-**Would you like me to help you create the `docker-compose.yml` file that specifically links all these monitoring tools together?**
+📁 **GitHub:** [https://github.com/Bibek-2024/devops-build.git]
 
-```
+---
