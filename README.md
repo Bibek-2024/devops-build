@@ -1,3 +1,4 @@
+```markdown
 <h1 align="center">🛒 ReactJS E-Commerce DevOps Project</h1>
 
 <p align="center">
@@ -15,14 +16,14 @@
 ---
 
 ## 📌 Table of Contents
-* [Overview](#-overview)
-* [Tools & Technologies](#-tools--technologies)
-* [Project Structure](#-project-structure)
-* [Pipeline Architecture](#-pipeline-architecture)
-* [CI/CD Branching Strategy](#-cicd-branching-strategy)
-* [Monitoring & Observability](#-monitoring--observability)
-* [How to Run](#-how-to-run)
-* [Author & Contact](#-author--contact)
+- [Overview](#-overview)
+- [Tools & Technologies](#-tools--technologies)
+- [Project Structure](#-project-structure)
+- [Pipeline Architecture](#-pipeline-architecture)
+- [CI/CD Branching Strategy](#-cicd-branching-strategy)
+- [Monitoring & Observability](#-monitoring--observability)
+- [How to Run This Project](#-how-to-run-this-project)
+- [Author & Contact](#-author--contact)
 
 ---
 
@@ -35,17 +36,16 @@ This project showcases a complete DevOps lifecycle for a ReactJS application hos
 
 | Category | Tools Used |
 | :--- | :--- |
-| **Cloud** | AWS EC2 (Ubuntu 24.04), Security Groups, IAM |
+| **Cloud Infrastructure** | AWS EC2 (t2.micro), Security Groups, IAM |
 | **Containerization** | Docker, Docker Compose, Multi-stage Builds |
-| **CI/CD** | Jenkins (Multibranch), GitHub Webhooks |
-| **Web Server** | Nginx (Optimized for React production builds) |
+| **CI/CD Automation** | Jenkins (Multibranch), GitHub Webhooks |
+| **Web Server** | Nginx (Alpine-optimized) |
 | **Observability** | Prometheus, Grafana, Blackbox Exporter |
+| **Scripting** | Bash (Shell Automation) |
 
 ---
 
 ## 📂 Project Structure
-Actual directory tree from the `dev` branch:
-
 ```text
 .
 ├── Jenkinsfile            # CI/CD Pipeline definition
@@ -63,43 +63,39 @@ Actual directory tree from the `dev` branch:
     ├── build.sh           # Docker image build logic
     ├── deploy.sh          # EC2 deployment automation
     └── health-check.sh    # Post-deployment validation
+
+```
+
 ---
+
 ## 🏗️ Pipeline Architecture
 
 The diagram below illustrates the flow from a developer's machine to the live production server.
 
 <p align="center">
-  <img src="./images/ReactJS%20E-Commerce%20DevOps%20Project%20Architecture%20Diagram.png" alt="Architecture Diagram" width="800">
+<img src="./images/ReactJS%20E-Commerce%20DevOps%20Project%20Architecture%20Diagram.png" alt="Architecture Diagram" width="850">
 </p>
 
-
-The automation workflow is designed for high reliability and zero manual intervention. Every change is validated through a structured multi-stage pipeline.
+### **CI/CD Execution Flow**
 
 > **Developer Commit** ➔ **GitHub Webhook** ➔ **Jenkins Pipeline** ➔ **Docker Hub** ➔ **AWS EC2**
-
-
-
-### **Execution Workflow**
-
-* **⚡ Trigger:** A code push to the repository initiates a **GitHub Webhook**, notifying the Jenkins Master.
-* **🏗️ Build & Test:** Jenkins parses the `Jenkinsfile`, initiates a multi-stage Docker build, and runs application health checks.
-* **📦 Registry:** Upon a successful build, the image is tagged based on the branch (`dev` or `prod`) and pushed to **Docker Hub**.
-* **🚀 Deployment:** The AWS EC2 instance pulls the latest container image and executes `scripts/deploy.sh` to restart the service with zero downtime.
 
 ---
 
 ## 🚀 CI/CD Branching Strategy
 
-We follow a strict branching model to isolate development changes from the production environment.
+We follow a strict branching model to isolate development changes from the production environment, ensuring stability and rapid deployment.
 
 | Environment | Branch | Docker Hub Repository | Visibility |
-| :--- | :--- | :--- | :--- |
-| <img src="https://img.shields.io/badge/-Production-green" /> | `main` | `bibekdec2022/prod` | 🔒 Private |
-| <img src="https://img.shields.io/badge/-Staging-blue" /> | `dev` | `bibekdec2022/dev` | 🌍 Public |
+| --- | --- | --- | --- |
+| <img src="https://img.shields.io/badge/-Production-green?style=flat-square" /> | `main` | `bibekdec2022/prod` | 🔒 Private |
+| <img src="https://img.shields.io/badge/-Staging-blue?style=flat-square" /> | `dev` | `bibekdec2022/dev` | 🌍 Public |
 
-### **Version Control Policy**
-* **Git CLI Mastery:** All operations are performed via the command line to ensure a clean, linear commit history.
-* **Automated Tagging:** Jenkins automatically applies version tags to Docker images based on the build number.
+### **Workflow Guidelines**
+
+* **Git CLI Standard:** All version control operations are managed strictly via the command line to maintain a clean and linear commit history.
+* **Automated Tagging:** The Jenkins pipeline automatically applies version tags to Docker images based on the specific build number.
+
 ---
 
 ## 📊 Monitoring & Observability
@@ -117,7 +113,7 @@ We implemented a proactive monitoring strategy to track the health of the E-comm
 ### 1. Clone & Initialize
 
 ```bash
-git clone https://github.com/Bibek-2024/devops-build.git
+git clone [https://github.com/Bibek-2024/devops-build.git](https://github.com/Bibek-2024/devops-build.git)
 cd devops-build
 
 ```
@@ -141,17 +137,12 @@ docker-compose up -d --build
 
 ## 👤 Author & Contact
 
-**Your Name** 
+### **Bibek Kumar Sahu**
 
-# Bibek Kumar Sahu
-### *Aspiring DevOps & Cloud Infrastructure Engineer*
+*Aspiring DevOps & Cloud Infrastructure Engineer*
 
----
-
-📫 **Email:** [bibekkumarsahu2011@gmail.com]
-
-🔗 **LinkedIn:** [https://www.linkedin.com/in/bibekkumarsahu/]
-
-📁 **GitHub:** [https://github.com/Bibek-2024/devops-build.git]
+📫 **Email:** [bibekkumarsahu2011@gmail.com](mailto:bibekkumarsahu2011@gmail.com)
+🔗 **LinkedIn:** [bibekkumarsahu](https://www.linkedin.com/in/bibekkumarsahu/)
+📁 **GitHub:** [Bibek-2024](https://www.google.com/search?q=https://github.com/Bibek-2024)
 
 ---
