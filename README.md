@@ -64,28 +64,42 @@ Actual directory tree from the `dev` branch:
     ├── deploy.sh          # EC2 deployment automation
     └── health-check.sh    # Post-deployment validation
 ---
-
 ## 🏗️ Pipeline Architecture
 
-**Workflow Execution:**
+The diagram below illustrates the flow from a developer's machine to the live production server.
 
-1. **Developer** pushes code to GitHub.
-2. **GitHub Webhook** triggers a Jenkins build.
-3. **Jenkins** executes the `Jenkinsfile` (Test -> Build -> Push).
-4. **Docker Hub** receives the tagged image (`dev` or `prod`).
-5. **AWS EC2** pulls the latest image and restarts via `deploy.sh`.
+<p align="center">
+  <img src="./images/ReactJS%20E-Commerce%20DevOps%20Project%20Architecture%20Diagram.png" alt="Architecture Diagram" width="800">
+</p>
+
+
+The automation workflow is designed for high reliability and zero manual intervention. Every change is validated through a structured multi-stage pipeline.
+
+> **Developer Commit** ➔ **GitHub Webhook** ➔ **Jenkins Pipeline** ➔ **Docker Hub** ➔ **AWS EC2**
+
+
+
+### **Execution Workflow**
+
+* **⚡ Trigger:** A code push to the repository initiates a **GitHub Webhook**, notifying the Jenkins Master.
+* **🏗️ Build & Test:** Jenkins parses the `Jenkinsfile`, initiates a multi-stage Docker build, and runs application health checks.
+* **📦 Registry:** Upon a successful build, the image is tagged based on the branch (`dev` or `prod`) and pushed to **Docker Hub**.
+* **🚀 Deployment:** The AWS EC2 instance pulls the latest container image and executes `scripts/deploy.sh` to restart the service with zero downtime.
 
 ---
 
 ## 🚀 CI/CD Branching Strategy
 
-| Branch | Env Target | Registry Repository | Access |
-| --- | --- | --- | --- |
-| `main` | **Production** | `bibekdec2022/prod` | Private |
-| `dev` | **Staging** | `bibekdec2022/dev` | Public |
+We follow a strict branching model to isolate development changes from the production environment.
 
-*All version control is managed strictly via Git CLI to maintain a clean commit history.*
+| Environment | Branch | Docker Hub Repository | Visibility |
+| :--- | :--- | :--- | :--- |
+| <img src="https://img.shields.io/badge/-Production-green" /> | `main` | `bibekdec2022/prod` | 🔒 Private |
+| <img src="https://img.shields.io/badge/-Staging-blue" /> | `dev` | `bibekdec2022/dev` | 🌍 Public |
 
+### **Version Control Policy**
+* **Git CLI Mastery:** All operations are performed via the command line to ensure a clean, linear commit history.
+* **Automated Tagging:** Jenkins automatically applies version tags to Docker images based on the build number.
 ---
 
 ## 📊 Monitoring & Observability
